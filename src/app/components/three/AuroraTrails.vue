@@ -31,7 +31,7 @@ const visible = computed(() => props.streak >= 3)
 const color = computed(() => {
   if (props.streak >= 21) return '#ffd700' // Gold
   if (props.streak >= 11) return '#f43f5e' // Pink
-  if (props.streak >= 6) return '#a855f7'  // Purple
+  if (props.streak >= 6) return '#a855f7' // Purple
   return '#00d4ff' // Blue
 })
 
@@ -57,9 +57,9 @@ const vertexShader = `
     vUv = uv;
     vec3 pos = position;
 
-    // Wave motion
-    pos.y += sin(pos.x * 0.5 + uTime) * 0.5;
-    pos.z += cos(pos.x * 0.3 + uTime * 0.7) * 0.3;
+    // Wave motion (more visible amplitude)
+    pos.y += sin(pos.x * 0.3 + uTime * 2.0) * 1.5;
+    pos.z += cos(pos.x * 0.2 + uTime * 1.5) * 1.0;
 
     gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
   }
