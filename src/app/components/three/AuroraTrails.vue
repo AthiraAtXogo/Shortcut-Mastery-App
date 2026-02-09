@@ -17,10 +17,10 @@ const { prefersReducedMotion } = useThree()
 
 // #region state
 const canvasRef = ref<HTMLCanvasElement>()
-const scene = ref<THREE.Scene>()
-const camera = ref<THREE.PerspectiveCamera>()
-const renderer = ref<THREE.WebGLRenderer>()
-const ribbons = ref<THREE.Mesh[]>([])
+const scene = shallowRef<THREE.Scene>()
+const camera = shallowRef<THREE.PerspectiveCamera>()
+const renderer = shallowRef<THREE.WebGLRenderer>()
+const ribbons = shallowRef<THREE.Mesh[]>([])
 const time = ref(0)
 const animationFrameId = ref<number>()
 // #endregion
@@ -41,9 +41,9 @@ const intensity = computed(() => {
 
 const colorRGB = computed(() => {
   const hex = color.value.replace('#', '')
-  const r = parseInt(hex.substring(0, 2), 16) / 255
-  const g = parseInt(hex.substring(2, 4), 16) / 255
-  const b = parseInt(hex.substring(4, 6), 16) / 255
+  const r = Number.parseInt(hex.substring(0, 2), 16) / 255
+  const g = Number.parseInt(hex.substring(2, 4), 16) / 255
+  const b = Number.parseInt(hex.substring(4, 6), 16) / 255
   return new THREE.Vector3(r, g, b)
 })
 // #endregion
@@ -78,8 +78,8 @@ const fragmentShader = `
     // Horizontal fade on edges
     alpha *= smoothstep(0.0, 0.1, vUv.x) * smoothstep(1.0, 0.9, vUv.x);
 
-    // Apply intensity and global opacity
-    alpha *= uIntensity * 0.6 * uOpacity;
+    // Apply intensity and global opacity (much more visible)
+    alpha *= (0.6 + uIntensity * 0.4) * uOpacity;
 
     gl_FragColor = vec4(uColor, alpha);
   }
@@ -100,7 +100,7 @@ function initThree() {
     0.1,
     1000
   )
-  camera.value.position.z = 15
+  camera.value.position.z = 30
 
   // Renderer
   renderer.value = new THREE.WebGLRenderer({
@@ -125,15 +125,15 @@ function createRibbons() {
   ribbons.value = []
 
   for (let i = 0; i < ribbonCount; i++) {
-    const geometry = new THREE.PlaneGeometry(20, 2, 32, 8)
+    const geometry = new THREE.PlaneGeometry(40, 6, 32, 8)
     const material = new THREE.ShaderMaterial({
       vertexShader,
       fragmentShader,
       uniforms: {
         uTime: { value: 0 },
-        uColor: { value: colorRGB.value },
+        uColor: { value: colorRGB.value.clone() },
         uIntensity: { value: intensity.value },
-        uOpacity: { value: 0 }
+        uOpacity: { value: visible.value ? 1 : 0 }
       },
       transparent: true,
       side: THREE.DoubleSide,
@@ -143,9 +143,9 @@ function createRibbons() {
     const mesh = new THREE.Mesh(geometry, material)
 
     // Position ribbons
-    mesh.position.y = (i - 1) * 3
-    mesh.position.z = -5 - i * 2
-    mesh.rotation.x = Math.PI * 0.1
+    mesh.position.y = (i - 1) * 4
+    mesh.position.z = 0
+    mesh.rotation.x = 0
 
     scene.value.add(mesh)
     ribbons.value.push(mesh)
@@ -155,26 +155,35 @@ function createRibbons() {
 function updateRibbons() {
   ribbons.value.forEach((ribbon) => {
     const material = ribbon.material as THREE.ShaderMaterial
+    if (!material.uniforms) return
 
     // Update time
-    material.uniforms.uTime.value = time.value
+    if (material.uniforms.uTime) {
+      material.uniforms.uTime.value = time.value
+    }
 
     // Update color
-    material.uniforms.uColor.value = colorRGB.value
+    if (material.uniforms.uColor) {
+      material.uniforms.uColor.value.copy(colorRGB.value)
+    }
 
     // Update intensity
-    material.uniforms.uIntensity.value = intensity.value
+    if (material.uniforms.uIntensity) {
+      material.uniforms.uIntensity.value = intensity.value
+    }
 
     // Handle visibility with smooth fade
-    const currentOpacity = material.uniforms.uOpacity.value
-    const targetOpacity = visible.value ? 1 : 0
+    if (material.uniforms.uOpacity) {
+      const currentOpacity = material.uniforms.uOpacity.value
+      const targetOpacity = visible.value ? 1 : 0
 
-    if (currentOpacity !== targetOpacity) {
-      material.uniforms.uOpacity.value = THREE.MathUtils.lerp(
-        currentOpacity,
-        targetOpacity,
-        0.05
-      )
+      if (Math.abs(currentOpacity - targetOpacity) > 0.01) {
+        material.uniforms.uOpacity.value = THREE.MathUtils.lerp(
+          currentOpacity,
+          targetOpacity,
+          0.05
+        )
+      }
     }
   })
 }
@@ -241,7 +250,7 @@ onUnmounted(() => {
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: -1;
+  z-index: 1;
   pointer-events: none;
 }
 
