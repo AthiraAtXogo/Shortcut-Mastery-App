@@ -1,140 +1,178 @@
-# Project Context (Template)
 
-⚠️ **This file is a template.** Follow the bootstrap instructions below.
-
-Claude (and other AI tools) rely on this file to understand the project.
-When this bootstrap section is present, the project has not been configured yet.
-
----
-
-## Bootstrap Instructions for Claude
-
-When you read this file and see this section, help the user set up their project
-using the BRAIN method. Read `.claude/commands/brain.md` for full BRAIN details.
-
-### Welcome Message
-
-Display this to the user:
-
-> **Welcome to the HelpIRL Claude Template** 👋
->
-> This repository is pre-wired with a practical, opinionated structure for working
-> with Claude in a way that stays readable, repeatable, and team-friendly.
->
-> **You'll find:**
-> - A ready-to-use `.claude/` setup (commands, hooks, and skills)
-> - `.github/` structure to encourage clean commits and reviews
-> - A lightweight workflow designed to scale from solo work to teams
->
-> This template uses the **BRAIN method** to establish shared context before any
-> code is written.
->
-> **Begin (B):**
-> This is idea capture only — no design, no planning, no solutions yet.
->
-> Once that's done, I'll guide you through:
-> - **Refine (R):** clarifying goals and constraints
-> - **Arrange (A):** identifying developer tasks and structure
->
-> You can move fast or go deep — the structure is here to support either.
->
-> ---
->
-> **What is this project? Give me the elevator pitch in 2-3 sentences.**
-
-### Bootstrap Flow
-
-1. **Auto-detect values**:
-   - OWNER/REPO from `git remote get-url origin`
-   - Existing folder structure
-
-2. **Begin Phase**:
-   - Wait for user to describe their project (they were prompted in welcome message)
-   - Acknowledge receipt only—no analysis, suggestions, or reframing
-   - Commit: `chore(init): begin project definition`
-
-3. **Refine Phase** — Ask targeted questions:
-   - Primary language/framework?
-   - Build command? (or "none yet")
-   - Test command? (or "none yet")
-   - Source code location? (e.g., `src/`, `lib/`, project root)
-   - Any key constraints or considerations?
-   - Commit: `chore(init): refine project context`
-
-4. **Populate Files**:
-   - Replace this CONTEXT.md with real values (use template in next section)
-   - Update `.github/ISSUE_TEMPLATE/config.yml`—replace `OWNER/REPO` with detected values
-   - Commit: `chore(init): populate project configuration`
-
-5. **Explain Task Workflow**:
-   - "Your project is configured. Features are broken into tasks under `Tasks/`."
-   - "Standard practice: commit when each task is complete so work is captured
-     and you have clean rollback points."
-   - Explain the file structure that will be created:
-     ```
-     Tasks/
-       {FeatureName}/
-         CONTEXT.md        # Feature context (Begin + Refine)
-         Status.md         # Progress tracking
-         01-TaskName.md    # Individual task files
-         02-TaskName.md
-         ...
-     ```
-   - **Important:** Each task MUST be its own file. This provides:
-     - Clear audit trail for what was done
-     - Safe rollback points per task
-     - Readable history even with auto-accept enabled
-
-6. **Transition**:
-   - Ask if ready to scaffold their first feature
-   - If yes, follow `.claude/commands/brain.md` to create the task file structure
-   - **Do not skip creating task files** — the Arrange phase must produce individual
-     `##-TaskName.md` files, not just notes in CONTEXT.md
-
----
-
-## CONTEXT.md Template (use this for replacement)
-
-Once bootstrap is complete, replace this entire file with the following,
-filled in with the user's answers:
-
-```markdown
 # Project Context
+
+## Overview
+
+**Shortcut Mastery App** — A premium gamified keyboard shortcut learning application with immersive 3D visuals, satisfying animations, and addictive gameplay mechanics.
 
 ## Project Structure
 
-- **Source code**: {location}
-- **Tests**: {location or "none yet"}
-- **Config files**: {list relevant files}
-- **Generated artifacts**: {build outputs, or "none"}
+- **Source code**: `src/` (Nuxt 4 app)
+- **Tests**: `tests/` (Vitest + Playwright)
+- **Config files**: `nuxt.config.ts`, `tailwind.config.ts`
+- **Generated artifacts**: `.output/`, `.nuxt/`
 
 ## Language & Tooling
 
-- **Language**: {language}
-- **Framework**: {framework or "none"}
-- **Build**: `{build command}` or "none yet"
-- **Test**: `{test command}` or "none yet"
-- **Package manager**: {npm, pip, cargo, etc. if applicable}
+- **Language**: TypeScript
+- **Framework**: Nuxt 4 + Vue 3
+- **UI**: Nuxt UI + Custom components
+- **Styling**: Tailwind CSS + CSS Variables
+- **2D Animation**: GSAP (GreenSock)
+- **3D Graphics**: Three.js + @tresjs/core (Vue wrapper)
+- **Audio**: Howler.js
+- **Storage**: IndexedDB (Dexie.js wrapper)
+- **PWA**: @vite-pwa/nuxt
+- **Icons**: Iconify
+- **Package manager**: pnpm
 
 ## Build & Test Entry Points
 
-These are the approved commands. Do not invent alternatives.
-
-- Build: `{command}`
-- Test: `{command}`
-- Lint: `{command}` (if applicable)
+- Dev: `pnpm dev`
+- Build: `pnpm build`
+- Test: `pnpm test`
+- Lint: `pnpm lint`
 
 ## Task Management
 
 Tasks are stored under `Tasks/{FeatureName}/` with numbered task files.
 See `.claude/commands/brain.md` for the BRAIN workflow.
 
-## Constraints
+---
 
-{Any project-specific rules, limitations, or considerations the user mentioned}
+## Visual Design System
+
+### Theme & Colors
+
 ```
+Background:     Deep dark (#0a0a0f) with neural network
+Primary:        Electric blue (#00d4ff)
+Secondary:      Neon purple (#a855f7)
+Success:        Lime green (#84cc16)
+Error:          Hot pink (#f43f5e)
+Accent:         Orange spark (#f97316)
+```
+
+### Three.js Effects
+
+| Effect | Where | Description |
+|--------|-------|-------------|
+| Neural Background | Global | Connected nodes, energy pulses on correct |
+| Aurora Trails | Streak indicator | Flowing color ribbons |
+| 3D Keyboard | Home, game | Floating keyboard, keys illuminate |
+| Explosion Shards | Correct answer | Geometric shards burst outward |
+| Portal Vortex | Level up | Swirling energy tunnel |
+| Combo Chain | Multi-combo | Energy connects recent answers |
+| Boss Avatar | Boss battle | 3D app icon (VS Code, etc.) |
+| Floating Icons | Category select | App logos orbiting in 3D |
+
+### GSAP Animations
+
+| Animation | Where | Effect |
+|-----------|-------|--------|
+| Magnetic Cursor | Interactive elements | Subtle pull toward mouse |
+| Text Scramble | Scores, timers | Letters scramble then reveal |
+| Elastic Bounce | Buttons, cards | Satisfying overshoot |
+| Stagger Cascade | Lists, menus | Ripple sequence |
+| Flip Cards | Memory Match | 3D card flip |
+| Shake & Flash | Wrong answer | Screen shake + red flash |
+| Confetti Burst | Achievements | Particles spray |
+| Counter Roll | XP, scores | Slot machine roll |
+| Draw On | Progress bars | Line draws itself |
+
+### Card Design
+
+- Holographic shimmer on hover
+- Magnetic distortion (warps toward cursor)
+- Plasma animated borders
+- 3D tilt effect following mouse
 
 ---
 
-End of bootstrap instructions. Once CONTEXT.md is replaced, this section is gone
-and Claude will read the real project context instead.
+## Game Modes (12)
+
+| Mode | Description | Difficulty |
+|------|-------------|------------|
+| Practice | No pressure learning | Easy |
+| Flash Round | Single shortcut, 3 sec timer | Easy |
+| Speed Run | 10 shortcuts, fastest time | Medium |
+| Survival | Until 3 mistakes | Medium |
+| Time Attack | How many in 60 seconds | Medium |
+| Daily Challenge | 5 curated daily | Medium |
+| Rhythm Mode | Beat-synced falling shortcuts | Medium |
+| Memory Match | Flip and match pairs | Medium |
+| Type Mode | Type shortcut letter by letter | Medium |
+| Blind Mode | No visual keyboard | Hard |
+| Boss Battle | Execute combo chains | Hard |
+| Endless | Infinite, scaling difficulty | Variable |
+
+---
+
+## App Categories
+
+| Category | Apps Covered |
+|----------|--------------|
+| OS | Windows, macOS |
+| Browsers | Chrome, Edge, Firefox |
+| Code Editors | VS Code, Cursor, JetBrains |
+| AI Tools | Claude, ChatGPT, Copilot |
+| Productivity | Notion, Slack, Discord, Figma |
+
+---
+
+## Gamification Features
+
+| Feature | Description |
+|---------|-------------|
+| XP & Levels | 1-100 levels, unlock content |
+| Streaks | Daily streaks with multiplier |
+| Achievements | 50+ badges |
+| Combo System | Chain answers for multiplier |
+| Mastery Levels | New → Learning → Familiar → Master |
+| Spaced Repetition | Weak shortcuts appear more |
+
+---
+
+## Learning Features
+
+| Feature | Description |
+|---------|-------------|
+| Shortcut Stories | Memory tricks: "C = Copy" |
+| Context GIFs | 5-sec demo in real app |
+| Cheat Sheet Export | Generate PDF |
+| Weakness Analysis | Identify struggle areas |
+| Learning Paths | Suggested order |
+
+---
+
+## Social Features (Phase 2)
+
+| Feature | Description |
+|---------|-------------|
+| Share Score | Shareable image |
+| Challenge Link | Send to friend |
+| Weekly Tournament | Compete globally |
+
+---
+
+## Accessibility
+
+| Feature | Description |
+|---------|-------------|
+| Reduced Motion | Disable intense animations |
+| High Contrast | Better visibility |
+| Colorblind Modes | Multiple options |
+| Screen Reader | Full ARIA support |
+| Custom Timing | Adjust time limits |
+
+---
+
+## Constraints
+
+- Must work fully offline (PWA)
+- No backend required (IndexedDB)
+- Desktop-first, mobile-friendly
+- Keyboard accessible throughout
+- Real keyboard input for shortcuts
+- Smooth 60fps animations
+- Fun and engaging — not boring flashcards
