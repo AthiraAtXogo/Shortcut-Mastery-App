@@ -29,5 +29,10 @@
     ]
   },
 
+  "model": {
+    "contextSize": "standard",
+    "enableBetaFeatures": false
+  },
+
   "env": {}
 }

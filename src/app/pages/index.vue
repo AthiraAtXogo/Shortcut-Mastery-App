@@ -1,202 +1,326 @@
 <script setup lang="ts">
-const { elasticBounce, textScramble } = useGsap()
+// #region composables
+const { textScramble } = useGsap()
 
-const titleRef = ref<HTMLElement>()
-const scoreRef = ref<HTMLElement>()
-const score = ref(0)
+// Initialize store (auto-imported by Nuxt)
+const userStore = useUserStore()
 
-function handleCorrect() {
-  score.value += 100
-  if (scoreRef.value) {
-    const { counterRoll } = useGsap()
-    counterRoll(scoreRef.value, score.value, { duration: 0.5 })
-  }
+// Load user data from database
+if (process.client) {
+  userStore.loadFromDatabase()
 }
+// #endregion
 
+// #region state
+const titleRef = ref<HTMLElement>()
+const mounted = ref(false)
+// #endregion
+
+// #region lifecycle
 onMounted(() => {
+  mounted.value = true
   if (titleRef.value) {
-    textScramble(titleRef.value, 'Shortcut Mastery', { duration: 1 })
+    textScramble(titleRef.value, 'SHORTCUT MASTERY', { duration: 1.2 })
   }
 })
+// #endregion
+
+// #region handlers
+function startQuickPlay() {
+  // TODO: Navigate to quick play
+  console.log('Quick Play')
+}
+
+function goToArcade() {
+  // TODO: Navigate to arcade
+  console.log('Arcade Mode')
+}
+
+function goToLearn() {
+  // TODO: Navigate to learn mode
+  console.log('Learn Mode')
+}
+
+function goToDailyChallenge() {
+  // TODO: Navigate to daily challenge
+  console.log('Daily Challenge')
+}
+
+function goToAchievements() {
+  // TODO: Navigate to achievements
+  console.log('Achievements')
+}
+// #endregion
 </script>
 
 <template>
-  <div class="min-h-screen p-8">
-    <!-- Hero Section -->
-    <div class="text-center mb-16">
-      <h1 ref="titleRef" class="text-hero text-gradient-primary mb-4">
-        Shortcut Mastery
+  <div class="home-screen">
+    <!-- 3D Neural Background -->
+    <ThreeNeuralBackground />
+
+    <!-- Title -->
+    <header class="home-screen__header">
+      <h1 ref="titleRef" class="home-screen__title">
+        SHORTCUT MASTERY
       </h1>
-      <p class="text-body text-opacity-medium max-w-xl mx-auto">
+      <p class="home-screen__subtitle">
         Master keyboard shortcuts through gamified learning
       </p>
+    </header>
+
+    <!-- Main Actions -->
+    <nav class="home-screen__actions">
+      <UiHoloCard
+        size="lg"
+        class="home-screen__card"
+        @click="startQuickPlay"
+      >
+        <div class="card-content">
+          <div class="card-icon">⚡</div>
+          <h3 class="card-title">Quick Play</h3>
+          <p class="card-description">Jump right in</p>
+        </div>
+      </UiHoloCard>
+
+      <UiHoloCard
+        size="lg"
+        class="home-screen__card"
+        glow-color="rgba(168, 85, 247, 0.3)"
+        @click="goToArcade"
+      >
+        <div class="card-content">
+          <div class="card-icon">🎮</div>
+          <h3 class="card-title">Arcade Mode</h3>
+          <p class="card-description">Challenge yourself</p>
+        </div>
+      </UiHoloCard>
+
+      <UiHoloCard
+        size="lg"
+        class="home-screen__card"
+        glow-color="rgba(132, 204, 22, 0.3)"
+        @click="goToLearn"
+      >
+        <div class="card-content">
+          <div class="card-icon">📚</div>
+          <h3 class="card-title">Learn Mode</h3>
+          <p class="card-description">Master the basics</p>
+        </div>
+      </UiHoloCard>
+    </nav>
+
+    <!-- Stats Bar -->
+    <div class="home-screen__stats">
+      <div class="stat-item">
+        <div class="stat-icon">🔥</div>
+        <div class="stat-content">
+          <span class="stat-value">{{ userStore.dailyStreak }}</span>
+          <span class="stat-label">Day Streak</span>
+        </div>
+      </div>
+
+      <div class="stat-item">
+        <div class="stat-icon">⭐</div>
+        <div class="stat-content">
+          <span class="stat-value">Level {{ userStore.level }}</span>
+          <span class="stat-label">Current Level</span>
+        </div>
+      </div>
+
+      <div class="stat-item">
+        <div class="stat-icon">🏆</div>
+        <div class="stat-content">
+          <span class="stat-value">{{ userStore.xp }}</span>
+          <span class="stat-label">Total XP</span>
+        </div>
+      </div>
     </div>
 
-    <!-- Score Display -->
-    <div class="text-center mb-12">
-      <p class="text-caption text-opacity-low mb-2">SCORE</p>
-      <p ref="scoreRef" class="text-4xl font-bold text-gradient-primary">
-        {{ score }}
-      </p>
-    </div>
-
-    <!-- Component Showcase -->
-    <div class="max-w-4xl mx-auto space-y-12">
-      <!-- Buttons Section -->
-      <section>
-        <h2 class="text-heading mb-6">Buttons</h2>
-        <div class="flex flex-wrap gap-4">
-          <UiGameButton variant="primary" @click="handleCorrect">
-            Primary
-          </UiGameButton>
-          <UiGameButton variant="secondary">
-            Secondary
-          </UiGameButton>
-          <UiGameButton variant="success">
-            Success
-          </UiGameButton>
-          <UiGameButton variant="danger">
-            Danger
-          </UiGameButton>
-          <UiGameButton variant="ghost">
-            Ghost
-          </UiGameButton>
-        </div>
-
-        <div class="flex flex-wrap gap-4 mt-4">
-          <UiGameButton size="sm">Small</UiGameButton>
-          <UiGameButton size="md">Medium</UiGameButton>
-          <UiGameButton size="lg">Large</UiGameButton>
-          <UiGameButton size="xl">Extra Large</UiGameButton>
-        </div>
-
-        <div class="flex flex-wrap gap-4 mt-4">
-          <UiGameButton icon-left="i-lucide-play">Start Game</UiGameButton>
-          <UiGameButton icon-right="i-lucide-arrow-right">Continue</UiGameButton>
-          <UiGameButton :loading="true">Loading</UiGameButton>
-        </div>
-      </section>
-
-      <!-- Cards Section -->
-      <section>
-        <h2 class="text-heading mb-6">Holographic Cards</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <UiHoloCard size="lg">
-            <div class="text-center">
-              <div class="text-4xl mb-2">🎮</div>
-              <h3 class="text-subheading mb-1">Practice Mode</h3>
-              <p class="text-body-sm text-opacity-medium">Learn at your pace</p>
-            </div>
-          </UiHoloCard>
-
-          <UiHoloCard size="lg" glow-color="rgba(168, 85, 247, 0.3)">
-            <div class="text-center">
-              <div class="text-4xl mb-2">⚡</div>
-              <h3 class="text-subheading mb-1">Speed Run</h3>
-              <p class="text-body-sm text-opacity-medium">Race against time</p>
-            </div>
-          </UiHoloCard>
-
-          <UiHoloCard size="lg" glow-color="rgba(132, 204, 22, 0.3)">
-            <div class="text-center">
-              <div class="text-4xl mb-2">🏆</div>
-              <h3 class="text-subheading mb-1">Boss Battle</h3>
-              <p class="text-body-sm text-opacity-medium">Ultimate challenge</p>
-            </div>
-          </UiHoloCard>
-        </div>
-      </section>
-
-      <!-- Plasma Borders Section -->
-      <section>
-        <h2 class="text-heading mb-6">Plasma Borders</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <UiPlasmaBorder>
-            <div class="p-6">
-              <h3 class="text-subheading mb-2">Animated Border</h3>
-              <p class="text-body-sm text-opacity-medium">
-                Flowing gradient that rotates continuously
-              </p>
-            </div>
-          </UiPlasmaBorder>
-
-          <UiPlasmaBorder speed="fast" :width="3">
-            <div class="p-6">
-              <h3 class="text-subheading mb-2">Fast & Thick</h3>
-              <p class="text-body-sm text-opacity-medium">
-                Faster animation with thicker border
-              </p>
-            </div>
-          </UiPlasmaBorder>
-        </div>
-      </section>
-
-      <!-- Keyboard Keys Section -->
-      <section>
-        <h2 class="text-heading mb-6">Keyboard Shortcuts</h2>
-        <div class="card-glass p-6 rounded-xl">
-          <p class="text-body mb-4">Press these keys to copy:</p>
-          <div class="flex items-center gap-2">
-            <span class="kbd kbd-primary">Ctrl</span>
-            <span class="text-opacity-low">+</span>
-            <span class="kbd kbd-primary">C</span>
-          </div>
-
-          <div class="divider my-6" />
-
-          <p class="text-body mb-4">Large keys:</p>
-          <div class="flex items-center gap-2">
-            <span class="kbd kbd-lg">⌘</span>
-            <span class="text-opacity-low">+</span>
-            <span class="kbd kbd-lg">Shift</span>
-            <span class="text-opacity-low">+</span>
-            <span class="kbd kbd-lg">P</span>
-          </div>
-        </div>
-      </section>
-
-      <!-- Typography Section -->
-      <section>
-        <h2 class="text-heading mb-6">Typography</h2>
-        <div class="space-y-4">
-          <p class="text-hero">Hero Text</p>
-          <p class="text-title">Title Text</p>
-          <p class="text-heading">Heading Text</p>
-          <p class="text-subheading">Subheading Text</p>
-          <p class="text-body">Body text for regular content</p>
-          <p class="text-body-sm text-opacity-medium">Small body text with medium opacity</p>
-          <p class="text-caption">CAPTION TEXT</p>
-          <p class="text-gradient-primary text-2xl font-bold">Gradient Text</p>
-          <p class="text-gradient-warm text-2xl font-bold">Warm Gradient</p>
-        </div>
-      </section>
-
-      <!-- Glows Section -->
-      <section>
-        <h2 class="text-heading mb-6">Glow Effects</h2>
-        <div class="flex flex-wrap gap-4">
-          <div class="w-24 h-24 rounded-xl bg-primary-500/20 glow-primary flex items-center justify-center">
-            <span class="text-primary-400">Primary</span>
-          </div>
-          <div class="w-24 h-24 rounded-xl bg-secondary-500/20 glow-secondary flex items-center justify-center">
-            <span class="text-secondary-400">Secondary</span>
-          </div>
-          <div class="w-24 h-24 rounded-xl bg-success-500/20 glow-success flex items-center justify-center">
-            <span class="text-success-400">Success</span>
-          </div>
-          <div class="w-24 h-24 rounded-xl bg-error-500/20 glow-error flex items-center justify-center">
-            <span class="text-error-400">Error</span>
-          </div>
-        </div>
-      </section>
-    </div>
-
-    <!-- Footer -->
-    <div class="text-center mt-16 pt-8">
-      <div class="divider mb-8" />
-      <p class="text-body-sm text-opacity-low">
-        Built with Nuxt 4 + Nuxt UI + GSAP + Three.js
-      </p>
-    </div>
+    <!-- Secondary Actions -->
+    <footer class="home-screen__footer">
+      <UiGameButton variant="secondary" @click="goToDailyChallenge">
+        🎯 Daily Challenge
+      </UiGameButton>
+      <UiGameButton variant="ghost" @click="goToAchievements">
+        🏅 Achievements
+      </UiGameButton>
+    </footer>
   </div>
 </template>
+
+<style scoped>
+.home-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  gap: 3rem;
+}
+
+/* ============ HEADER ============ */
+.home-screen__header {
+  text-align: center;
+}
+
+.home-screen__title {
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--color-primary-400), var(--color-secondary-400));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1rem;
+}
+
+.home-screen__subtitle {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  color: rgba(255, 255, 255, 0.7);
+  max-width: 600px;
+}
+
+/* ============ ACTIONS ============ */
+.home-screen__actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  max-width: 1200px;
+  width: 100%;
+}
+
+.home-screen__card {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.home-screen__card:hover {
+  transform: translateY(-4px);
+}
+
+.card-content {
+  text-align: center;
+  padding: 1.5rem;
+}
+
+.card-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.card-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--color-neutral-100);
+}
+
+.card-description {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* ============ STATS ============ */
+.home-screen__stats {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  max-width: 800px;
+  width: 100%;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.stat-icon {
+  font-size: 2.5rem;
+}
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-primary-400);
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* ============ FOOTER ============ */
+.home-screen__footer {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 768px) {
+  .home-screen {
+    gap: 2rem;
+    padding: 1rem;
+  }
+
+  .home-screen__actions {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .home-screen__stats {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.5rem;
+  }
+}
+
+/* ============ ANIMATIONS ============ */
+@media (prefers-reduced-motion: no-preference) {
+  .home-screen__header,
+  .home-screen__actions,
+  .home-screen__stats,
+  .home-screen__footer {
+    animation: fadeInUp 0.6s ease-out backwards;
+  }
+
+  .home-screen__actions {
+    animation-delay: 0.2s;
+  }
+
+  .home-screen__stats {
+    animation-delay: 0.4s;
+  }
+
+  .home-screen__footer {
+    animation-delay: 0.6s;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>

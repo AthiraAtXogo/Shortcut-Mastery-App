@@ -4,7 +4,7 @@
 
 | Task | Status | Notes |
 |------|--------|-------|
-| 01-neural-background | ⏳ Pending | |
+| 01-neural-background | ✅ Done | 80 nodes, drift animation, pulse effect, SSR-safe |
 | 02-aurora-trails | ⏳ Pending | |
 | 03-3d-keyboard | ⏳ Pending | |
 | 04-explosion-shards | ⏳ Pending | |
