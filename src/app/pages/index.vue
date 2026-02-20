@@ -6,7 +6,7 @@ const { textScramble } = useGsap()
 const userStore = useUserStore()
 
 // Load user data from database
-if (process.client) {
+if (import.meta.client) {
   userStore.loadFromDatabase()
 }
 // #endregion
@@ -14,6 +14,11 @@ if (process.client) {
 // #region state
 const titleRef = ref<HTMLElement>()
 const mounted = ref(false)
+
+// Randomly illuminate keys on the hero keyboard
+const DEMO_KEYS = ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'Space', 'ControlLeft', 'ShiftLeft', 'KeyC', 'KeyV', 'KeyZ']
+const heroHighlightedKeys = ref<string[]>([])
+let heroInterval: ReturnType<typeof setInterval>
 // #endregion
 
 // #region lifecycle
@@ -22,6 +27,16 @@ onMounted(() => {
   if (titleRef.value) {
     textScramble(titleRef.value, 'SHORTCUT MASTERY', { duration: 1.2 })
   }
+  // Randomly illuminate 2-3 keys every 1.5s for ambient effect
+  heroInterval = setInterval(() => {
+    const count = 2 + Math.floor(Math.random() * 2)
+    const shuffled = [...DEMO_KEYS].sort(() => Math.random() - 0.5)
+    heroHighlightedKeys.value = shuffled.slice(0, count)
+  }, 1500)
+})
+
+onUnmounted(() => {
+  clearInterval(heroInterval)
 })
 // #endregion
 
@@ -60,13 +75,23 @@ function goToAchievements() {
 
     <!-- Title -->
     <header class="home-screen__header">
-      <h1 ref="titleRef" class="home-screen__title">
+      <h1
+        ref="titleRef"
+        class="home-screen__title"
+      >
         SHORTCUT MASTERY
       </h1>
       <p class="home-screen__subtitle">
         Master keyboard shortcuts through gamified learning
       </p>
     </header>
+
+    <!-- 3D Keyboard Hero -->
+    <div class="home-screen__hero">
+      <ClientOnly>
+        <ThreeKeyboard3D :highlighted-keys="heroHighlightedKeys" />
+      </ClientOnly>
+    </div>
 
     <!-- Main Actions -->
     <nav class="home-screen__actions">
@@ -76,9 +101,15 @@ function goToAchievements() {
         @click="startQuickPlay"
       >
         <div class="card-content">
-          <div class="card-icon">⚡</div>
-          <h3 class="card-title">Quick Play</h3>
-          <p class="card-description">Jump right in</p>
+          <div class="card-icon">
+            ⚡
+          </div>
+          <h3 class="card-title">
+            Quick Play
+          </h3>
+          <p class="card-description">
+            Jump right in
+          </p>
         </div>
       </UiHoloCard>
 
@@ -89,9 +120,15 @@ function goToAchievements() {
         @click="goToArcade"
       >
         <div class="card-content">
-          <div class="card-icon">🎮</div>
-          <h3 class="card-title">Arcade Mode</h3>
-          <p class="card-description">Challenge yourself</p>
+          <div class="card-icon">
+            🎮
+          </div>
+          <h3 class="card-title">
+            Arcade Mode
+          </h3>
+          <p class="card-description">
+            Challenge yourself
+          </p>
         </div>
       </UiHoloCard>
 
@@ -102,9 +139,15 @@ function goToAchievements() {
         @click="goToLearn"
       >
         <div class="card-content">
-          <div class="card-icon">📚</div>
-          <h3 class="card-title">Learn Mode</h3>
-          <p class="card-description">Master the basics</p>
+          <div class="card-icon">
+            📚
+          </div>
+          <h3 class="card-title">
+            Learn Mode
+          </h3>
+          <p class="card-description">
+            Master the basics
+          </p>
         </div>
       </UiHoloCard>
     </nav>
@@ -112,7 +155,9 @@ function goToAchievements() {
     <!-- Stats Bar -->
     <div class="home-screen__stats">
       <div class="stat-item">
-        <div class="stat-icon">🔥</div>
+        <div class="stat-icon">
+          🔥
+        </div>
         <div class="stat-content">
           <span class="stat-value">{{ userStore.dailyStreak }}</span>
           <span class="stat-label">Day Streak</span>
@@ -120,7 +165,9 @@ function goToAchievements() {
       </div>
 
       <div class="stat-item">
-        <div class="stat-icon">⭐</div>
+        <div class="stat-icon">
+          ⭐
+        </div>
         <div class="stat-content">
           <span class="stat-value">Level {{ userStore.level }}</span>
           <span class="stat-label">Current Level</span>
@@ -128,7 +175,9 @@ function goToAchievements() {
       </div>
 
       <div class="stat-item">
-        <div class="stat-icon">🏆</div>
+        <div class="stat-icon">
+          🏆
+        </div>
         <div class="stat-content">
           <span class="stat-value">{{ userStore.xp }}</span>
           <span class="stat-label">Total XP</span>
@@ -138,10 +187,16 @@ function goToAchievements() {
 
     <!-- Secondary Actions -->
     <footer class="home-screen__footer">
-      <UiGameButton variant="secondary" @click="goToDailyChallenge">
+      <UiGameButton
+        variant="secondary"
+        @click="goToDailyChallenge"
+      >
         🎯 Daily Challenge
       </UiGameButton>
-      <UiGameButton variant="ghost" @click="goToAchievements">
+      <UiGameButton
+        variant="ghost"
+        @click="goToAchievements"
+      >
         🏅 Achievements
       </UiGameButton>
     </footer>
@@ -179,6 +234,17 @@ function goToAchievements() {
   font-size: clamp(1rem, 2vw, 1.25rem);
   color: rgba(255, 255, 255, 0.7);
   max-width: 600px;
+}
+
+/* ============ HERO KEYBOARD ============ */
+.home-screen__hero {
+  width: 100%;
+  max-width: 1000px;
+  height: 320px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 0 40px rgba(0, 212, 255, 0.08);
 }
 
 /* ============ ACTIONS ============ */
