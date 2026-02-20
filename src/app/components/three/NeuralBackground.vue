@@ -2,7 +2,7 @@
 import * as THREE from 'three'
 
 // #region setup
-interface Node {
+interface NodeData {
   id: string
   mesh: THREE.Mesh
   position: THREE.Vector3
@@ -29,19 +29,24 @@ const { prefersReducedMotion } = useThree()
 
 // #region state
 const canvasRef = ref<HTMLCanvasElement>()
-const nodes = ref<Node[]>([])
-const scene = ref<THREE.Scene>()
-const camera = ref<THREE.PerspectiveCamera>()
-const renderer = ref<THREE.WebGLRenderer>()
-const connectionLines = ref<THREE.LineSegments>()
+const scene = shallowRef<THREE.Scene>()
+const camera = shallowRef<THREE.PerspectiveCamera>()
+const renderer = shallowRef<THREE.WebGLRenderer>()
+const connectionLines = shallowRef<THREE.LineSegments>()
 const pulseActive = ref(false)
 const pulseRadius = ref(0)
+
+// Plain array — kept outside Vue reactivity to avoid proxy wrapping Three.js objects
+const nodes: NodeData[] = []
+
+let animFrameId = 0
+let frameCount = 0
 // #endregion
 
 // #region computed
 const isMobile = computed(() => {
-  if (!process.client) return false
-  return window.innerWidth < 768
+  if (!import.meta.client) return false
+  return globalThis.innerWidth < 768
 })
 
 const effectiveNodeCount = computed(() => {
@@ -53,45 +58,11 @@ const secondaryColor = 0xa855f7
 // #endregion
 
 // #region methods
-function initThree() {
-  if (!canvasRef.value) return
-
-  // Scene
-  scene.value = new THREE.Scene()
-
-  // Camera
-  camera.value = new THREE.PerspectiveCamera(
-    75,
-    window.innerWidth / window.innerHeight,
-    0.1,
-    1000
-  )
-  camera.value.position.z = 30
-
-  // Renderer
-  renderer.value = new THREE.WebGLRenderer({
-    canvas: canvasRef.value,
-    alpha: true,
-    antialias: true
-  })
-  renderer.value.setSize(window.innerWidth, window.innerHeight)
-  renderer.value.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-
-  // Generate nodes
-  generateNodes()
-
-  // Generate connections
-  updateConnections()
-
-  // Start animation
-  animate()
-}
-
 function generateNodes() {
   if (!scene.value) return
 
   const count = effectiveNodeCount.value
-  nodes.value = []
+  nodes.length = 0
 
   for (let i = 0; i < count; i++) {
     const geometry = new THREE.SphereGeometry(0.15, 8, 8)
@@ -110,7 +81,7 @@ function generateNodes() {
 
     scene.value.add(mesh)
 
-    nodes.value.push({
+    nodes.push({
       id: `node-${i}`,
       mesh,
       position: mesh.position.clone(),
@@ -134,28 +105,21 @@ function updateConnections() {
     ;(connectionLines.value.material as THREE.Material).dispose()
   }
 
-  // Calculate new connections
   const positions: number[] = []
   const maxDistance = props.connectionDistance
 
-  for (let i = 0; i < nodes.value.length; i++) {
-    for (let j = i + 1; j < nodes.value.length; j++) {
-      const distance = nodes.value[i].position.distanceTo(nodes.value[j].position)
-
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i + 1; j < nodes.length; j++) {
+      const distance = nodes[i]!.position.distanceTo(nodes[j]!.position)
       if (distance < maxDistance) {
         positions.push(
-          nodes.value[i].position.x,
-          nodes.value[i].position.y,
-          nodes.value[i].position.z,
-          nodes.value[j].position.x,
-          nodes.value[j].position.y,
-          nodes.value[j].position.z
+          nodes[i]!.position.x, nodes[i]!.position.y, nodes[i]!.position.z,
+          nodes[j]!.position.x, nodes[j]!.position.y, nodes[j]!.position.z
         )
       }
     }
   }
 
-  // Create line geometry
   const geometry = new THREE.BufferGeometry()
   geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3))
 
@@ -172,21 +136,13 @@ function updateConnections() {
 function updateNodePositions() {
   if (prefersReducedMotion.value) return
 
-  nodes.value.forEach(node => {
-    // Update position
+  nodes.forEach((node) => {
     node.position.add(node.velocity)
     node.mesh.position.copy(node.position)
 
-    // Bounce off boundaries
-    if (Math.abs(node.position.x) > 20) {
-      node.velocity.x *= -1
-    }
-    if (Math.abs(node.position.y) > 15) {
-      node.velocity.y *= -1
-    }
-    if (Math.abs(node.position.z) > 10) {
-      node.velocity.z *= -1
-    }
+    if (Math.abs(node.position.x) > 20) node.velocity.x *= -1
+    if (Math.abs(node.position.y) > 15) node.velocity.y *= -1
+    if (Math.abs(node.position.z) > 10) node.velocity.z *= -1
   })
 }
 
@@ -195,8 +151,7 @@ function updatePulse() {
 
   pulseRadius.value += 0.3
 
-  // Update node brightness based on pulse
-  nodes.value.forEach(node => {
+  nodes.forEach((node) => {
     const distanceFromCenter = node.position.length()
     const pulseEdge = pulseRadius.value
     const pulseWidth = 3
@@ -210,11 +165,59 @@ function updatePulse() {
     }
   })
 
-  // End pulse
   if (pulseRadius.value > 50) {
     pulseActive.value = false
     pulseRadius.value = 0
   }
+}
+
+function animate() {
+  if (!renderer.value || !scene.value || !camera.value) return
+
+  frameCount++
+  updateNodePositions()
+
+  if (frameCount % 10 === 0) {
+    updateConnections()
+  }
+
+  updatePulse()
+
+  renderer.value.render(scene.value, camera.value)
+  animFrameId = requestAnimationFrame(animate)
+}
+
+function initThree() {
+  if (!canvasRef.value) return
+
+  scene.value = new THREE.Scene()
+
+  camera.value = new THREE.PerspectiveCamera(
+    75,
+    globalThis.innerWidth / globalThis.innerHeight,
+    0.1,
+    1000
+  )
+  camera.value.position.z = 30
+
+  renderer.value = new THREE.WebGLRenderer({
+    canvas: canvasRef.value,
+    alpha: true,
+    antialias: true
+  })
+  renderer.value.setSize(globalThis.innerWidth, globalThis.innerHeight)
+  renderer.value.setPixelRatio(Math.min(globalThis.devicePixelRatio ?? 1, 2))
+
+  generateNodes()
+  updateConnections()
+  animate()
+}
+
+function handleResize() {
+  if (!camera.value || !renderer.value) return
+  camera.value.aspect = globalThis.innerWidth / globalThis.innerHeight
+  camera.value.updateProjectionMatrix()
+  renderer.value.setSize(globalThis.innerWidth, globalThis.innerHeight)
 }
 
 function triggerPulse() {
@@ -222,53 +225,23 @@ function triggerPulse() {
   pulseRadius.value = 0
   pulseActive.value = true
 }
-
-let frameCount = 0
-function animate() {
-  if (!renderer.value || !scene.value || !camera.value) return
-
-  frameCount++
-
-  // Update positions every frame
-  updateNodePositions()
-
-  // Update connections every 10 frames
-  if (frameCount % 10 === 0) {
-    updateConnections()
-  }
-
-  // Update pulse effect
-  updatePulse()
-
-  // Render
-  renderer.value.render(scene.value, camera.value)
-
-  requestAnimationFrame(animate)
-}
-
-function handleResize() {
-  if (!camera.value || !renderer.value) return
-
-  camera.value.aspect = window.innerWidth / window.innerHeight
-  camera.value.updateProjectionMatrix()
-  renderer.value.setSize(window.innerWidth, window.innerHeight)
-}
 // #endregion
 
 // #region lifecycle
 onMounted(() => {
   initThree()
-  window.addEventListener('resize', handleResize)
+  globalThis.addEventListener('resize', handleResize)
 })
 
 onUnmounted(() => {
-  window.removeEventListener('resize', handleResize)
+  cancelAnimationFrame(animFrameId)
+  globalThis.removeEventListener('resize', handleResize)
 
-  // Cleanup
-  nodes.value.forEach(node => {
+  nodes.forEach((node) => {
     node.mesh.geometry.dispose()
     ;(node.mesh.material as THREE.Material).dispose()
   })
+  nodes.length = 0
 
   if (connectionLines.value) {
     connectionLines.value.geometry.dispose()
@@ -279,14 +252,14 @@ onUnmounted(() => {
 })
 // #endregion
 
-// Expose trigger method
-defineExpose({
-  triggerPulse
-})
+defineExpose({ triggerPulse })
 </script>
 
 <template>
-  <canvas ref="canvasRef" class="neural-bg" />
+  <canvas
+    ref="canvasRef"
+    class="neural-bg"
+  />
 </template>
 
 <style scoped>
@@ -300,7 +273,6 @@ defineExpose({
   pointer-events: none;
 }
 
-/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .neural-bg {
     opacity: 0.3;
