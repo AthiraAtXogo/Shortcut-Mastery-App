@@ -4,7 +4,8 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
     '@nuxt/ui',
     '@vite-pwa/nuxt',
-    '@tresjs/nuxt'
+    '@tresjs/nuxt',
+    '@pinia/nuxt'
   ],
 
   pwa: {
