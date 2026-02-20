@@ -4,11 +4,11 @@
 
 | Task | Status | Notes |
 |------|--------|-------|
-| 01-key-capture | ⏳ Pending | |
-| 02-modifier-handling | ⏳ Pending | |
-| 03-combo-validation | ⏳ Pending | |
-| 04-visual-keyboard | ⏳ Pending | |
-| 05-input-feedback | ⏳ Pending | |
+| 01-key-capture | ✅ Done | Global listeners, normalizeKey, sticky fix, Playwright PASS |
+| 02-modifier-handling | ✅ Done | Platform detection, Ctrl/Cmd equivalence, formatCombo, Playwright PASS |
+| 03-combo-validation | ✅ Done | validate(), normalizeCombo(), validateWithTimeout(), Playwright PASS |
+| 04-visual-keyboard | ✅ Done | Full QWERTY, pressed/expected/correct/wrong states, 3 sizes, Playwright PASS |
+| 05-input-feedback | ✅ Done | Web Audio tones, CSS shake/glow, haptic, configurable, Playwright PASS |
 
 ## Blockers
 
