@@ -1,6 +1,7 @@
 <script setup lang="ts">
 // #region composables
 const { textScramble } = useGsap()
+const router = useRouter()
 
 // Initialize store (auto-imported by Nuxt)
 const userStore = useUserStore()
@@ -42,28 +43,23 @@ onUnmounted(() => {
 
 // #region handlers
 function startQuickPlay() {
-  // TODO: Navigate to quick play
-  console.log('Quick Play')
+  router.push('/game?mode=practice&app=vscode')
 }
 
 function goToArcade() {
-  // TODO: Navigate to arcade
-  console.log('Arcade Mode')
+  router.push('/category-select?mode=speed-run')
 }
 
 function goToLearn() {
-  // TODO: Navigate to learn mode
-  console.log('Learn Mode')
+  router.push('/category-select?mode=practice')
 }
 
 function goToDailyChallenge() {
-  // TODO: Navigate to daily challenge
-  console.log('Daily Challenge')
+  router.push('/game?mode=daily-challenge&app=vscode')
 }
 
 function goToAchievements() {
-  // TODO: Navigate to achievements
-  console.log('Achievements')
+  router.push('/achievements')
 }
 // #endregion
 </script>
