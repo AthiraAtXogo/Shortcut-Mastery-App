@@ -24,24 +24,26 @@ function toggleHighlight(code: string) {
 
 // #region lifecycle
 onMounted(() => {
-  window.addEventListener('keydown', handleKeyDown)
-  window.addEventListener('keyup', handleKeyUp)
+  globalThis.addEventListener('keydown', handleKeyDown)
+  globalThis.addEventListener('keyup', handleKeyUp)
 })
 
 onUnmounted(() => {
-  window.removeEventListener('keydown', handleKeyDown)
-  window.removeEventListener('keyup', handleKeyUp)
+  globalThis.removeEventListener('keydown', handleKeyDown)
+  globalThis.removeEventListener('keyup', handleKeyUp)
 })
 // #endregion
 </script>
 
 <template>
-  <div class="test-page" tabindex="0">
+  <div class="test-page">
     <div class="canvas-wrap">
-      <Keyboard3D
-        :pressed-keys="pressedKeys"
-        :highlighted-keys="highlightedKeys"
-      />
+      <ClientOnly>
+        <ThreeKeyboard3D
+          :pressed-keys="pressedKeys"
+          :highlighted-keys="highlightedKeys"
+        />
+      </ClientOnly>
     </div>
 
     <div class="controls">
@@ -74,9 +76,9 @@ onUnmounted(() => {
 }
 
 .canvas-wrap {
-  width: 900px;
+  width: min(900px, 95vw);
   height: 400px;
-  max-width: 95vw;
+  background: transparent;
 }
 
 .controls {
