@@ -56,6 +56,16 @@ If you notice something that could be improved (error handling, refactoring, log
 
 If a tool rejects an action, explain the failure and ask for guidance. Do not retry blindly.
 
+## Pre-Task Planning Protocol (mandatory)
+
+Before writing any code for a task group, always present:
+
+1. **Plan** — files to create/modify, approach in 3–5 bullet points
+2. **Playwright checks** — bulleted list of automated assertions to run
+3. **Manual test steps** — numbered steps with clickable dev server link
+
+Wait for user approval before writing any code.
+
 ## Output
 
 Be concise. Prefer structured output. Do not invent policies, branches, or permissions.
