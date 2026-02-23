@@ -22,7 +22,6 @@ const router = useRouter()
 const gameStore = useGameStore()
 const { onCorrect, onWrong, onCombo } = useInputFeedback()
 const { startCapture, stopCapture, pressedKeys: pressedKeysSet } = useKeyCapture()
-const pressedKeys = computed(() => Array.from(pressedKeysSet.value))
 // #endregion
 
 // #region state
@@ -38,6 +37,7 @@ const feedbackTimer = ref<ReturnType<typeof setTimeout>>()
 const challengeIndex = ref(0)
 const showHint = ref(false)
 const elapsedDisplay = ref('00:00')
+const virtualKeys = ref<Set<string>>(new Set())
 let elapsedTimer: ReturnType<typeof setInterval>
 let elapsedSeconds = 0
 
@@ -87,6 +87,20 @@ const comboColor = computed(() => {
 })
 
 const expectedKeys = computed(() => currentChallenge.value?.keys ?? [])
+
+const allPressedKeys = computed(() => [
+  ...Array.from(pressedKeysSet.value),
+  ...Array.from(virtualKeys.value)
+])
+
+const BROWSER_BLOCKED = new Set(['Ctrl+N', 'Ctrl+T', 'Ctrl+W', 'Ctrl+R', 'Ctrl+L'])
+
+const isOsBlocked = computed(() => {
+  const keys = expectedKeys.value
+  if (keys.includes('Cmd') || keys.includes('Meta')) return true
+  const combo = [...keys].sort().join('+')
+  return BROWSER_BLOCKED.has(combo)
+})
 // #endregion
 
 // #region methods
@@ -110,6 +124,7 @@ function nextChallenge() {
   correctKeys.value = []
   wrongKeys.value = []
   showHint.value = false
+  virtualKeys.value = new Set()
   challengeIndex.value++
 }
 
@@ -123,23 +138,34 @@ function handleCorrect() {
 }
 
 function handleWrong() {
-  wrongKeys.value = [...pressedKeysSet.value]
+  wrongKeys.value = [...allPressedKeys.value]
   gameStore.wrongAnswer()
   onWrong()
   showFeedback('wrong', '✗ WRONG')
   setTimeout(() => {
     wrongKeys.value = []
+    virtualKeys.value = new Set()
   }, 600)
 }
 
 function checkAnswer() {
   if (!currentChallenge.value || isPaused.value) return
-  const held = pressedKeys.value.map(k => k.toLowerCase()).sort()
+  const held = allPressedKeys.value.map(k => k.toLowerCase()).sort()
   const expected = expectedKeys.value.map(k => k.toLowerCase()).sort()
   if (held.length === 0) return
   const isCorrect = held.length === expected.length && held.every((k, i) => k === expected[i])
   if (isCorrect) handleCorrect()
   else if (held.length >= expected.length) handleWrong()
+}
+
+function handleKeyClick(key: string) {
+  const next = new Set(virtualKeys.value)
+  if (next.has(key)) {
+    next.delete(key)
+  } else {
+    next.add(key)
+  }
+  virtualKeys.value = next
 }
 
 function togglePause() {
@@ -162,7 +188,7 @@ function quit() {
 // #endregion
 
 // #region watchers
-watch(pressedKeys, checkAnswer, { deep: true })
+watch(allPressedKeys, checkAnswer, { deep: true })
 // #endregion
 
 // #region lifecycle
@@ -248,14 +274,26 @@ onUnmounted(() => {
       </Transition>
     </div>
 
+    <!-- OS-blocked hint -->
+    <Transition name="feedback">
+      <div
+        v-if="isOsBlocked"
+        class="os-blocked-hint"
+      >
+        ⚠️ This shortcut can't be captured by the browser — click the keys below
+      </div>
+    </Transition>
+
     <!-- Visual Keyboard -->
     <div class="game-keyboard">
       <VisualKeyboard
-        :pressed-keys="pressedKeys"
+        :pressed-keys="allPressedKeys"
         :expected-keys="expectedKeys"
         :correct-keys="correctKeys"
         :wrong-keys="wrongKeys"
+        :clickable="true"
         size="sm"
+        @key-click="handleKeyClick"
       />
     </div>
 
@@ -481,6 +519,20 @@ onUnmounted(() => {
 .feedback-enter-from,
 .feedback-leave-to {
   opacity: 0;
+}
+
+/* ============ OS BLOCKED HINT ============ */
+.os-blocked-hint {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #fbbf24;
+  text-align: center;
+  padding: 0.4rem 1.25rem;
+  background: rgba(251, 191, 36, 0.1);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: 8px;
+  width: 100%;
+  max-width: 900px;
 }
 
 /* ============ KEYBOARD ============ */

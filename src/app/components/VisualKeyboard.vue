@@ -13,6 +13,7 @@ interface Props {
   correctKeys?: string[]
   wrongKeys?: string[]
   size?: 'sm' | 'md' | 'lg'
+  clickable?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -20,8 +21,13 @@ const props = withDefaults(defineProps<Props>(), {
   expectedKeys: () => [],
   correctKeys: () => [],
   wrongKeys: () => [],
-  size: 'md'
+  size: 'md',
+  clickable: false
 })
+
+const emit = defineEmits<{
+  'key-click': [key: string]
+}>()
 // #endregion
 
 // #region composables
@@ -211,9 +217,11 @@ function isWrong(code: string): boolean {
           'visual-keyboard__key--pressed': isPressed(key.code),
           'visual-keyboard__key--expected': isExpected(key.code),
           'visual-keyboard__key--correct': isCorrect(key.code),
-          'visual-keyboard__key--wrong': isWrong(key.code)
+          'visual-keyboard__key--wrong': isWrong(key.code),
+          'visual-keyboard__key--clickable': clickable
         }"
         :style="{ width: `${(key.width ?? 1) * keySize}px`, height: `${keySize}px` }"
+        @click="clickable && emit('key-click', codeToKey(key.code))"
       >
         {{ getLabel(key) }}
       </div>
@@ -246,7 +254,7 @@ function isWrong(code: string): boolean {
   border: 1px solid #2a2a3e;
   border-bottom: 3px solid #111;
   border-radius: 5px;
-  color: #666;
+  color: #888;
   font-size: 11px;
   font-family: monospace;
   cursor: default;
@@ -290,6 +298,21 @@ function isWrong(code: string): boolean {
 @keyframes pulse-key {
   0%, 100% { opacity: 1; box-shadow: 0 0 6px #a855f766; }
   50% { opacity: 0.6; box-shadow: 0 0 14px #a855f7aa; }
+}
+
+.visual-keyboard__key--clickable {
+  cursor: pointer;
+}
+
+.visual-keyboard__key--clickable:hover {
+  background: #2e2e48;
+  color: #e0e0e0;
+  border-color: #4a4a6a;
+}
+
+.visual-keyboard__key--clickable:active {
+  transform: translateY(2px);
+  background: #3a3a5a;
 }
 
 /* Size variants */
