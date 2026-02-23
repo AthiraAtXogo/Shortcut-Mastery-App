@@ -4,12 +4,12 @@
 
 | Task | Status | Notes |
 |------|--------|-------|
-| 01-shortcut-stories | ⏳ Pending | |
-| 02-context-gifs | ⏳ Pending | |
-| 03-cheatsheet-export | ⏳ Pending | |
-| 04-weakness-analysis | ⏳ Pending | |
-| 05-learning-paths | ⏳ Pending | |
+| 01-shortcut-stories | ✅ Done | useShortcutStories.ts — 32 mnemonics, custom story support |
+| 02-context-gifs | ✅ Done | useContextDemo.ts — 14 scenario/before/after/tip entries |
+| 03-cheatsheet-export | ✅ Done | useCheatsheetExport.ts — HTML gen, print view, download |
+| 04-weakness-analysis | ✅ Done | useWeaknessAnalysis.ts — score formula, patterns, report |
+| 05-learning-paths | ✅ Done | useLearningPath.ts — 4 path types: default/quick/challenge/review |
 
 ## Blockers
 
-Requires ShortcutData for content.
+None — all complete.
