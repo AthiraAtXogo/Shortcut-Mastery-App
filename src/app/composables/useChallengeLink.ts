@@ -47,9 +47,7 @@ export function useChallengeLink() {
     if (config.challengerScore !== undefined) payload.cs = config.challengerScore
     if (config.challengerGrade) payload.cg = config.challengerGrade
 
-    const encoded = import.meta.client
-      ? btoa(JSON.stringify(payload))
-      : Buffer.from(JSON.stringify(payload)).toString('base64')
+    const encoded = btoa(JSON.stringify(payload))
 
     const base = baseUrl ?? (import.meta.client ? window.location.origin : 'https://shortcutmastery.app')
     return `${base}/game?${CHALLENGE_PARAM}=${encoded}`
@@ -68,9 +66,7 @@ export function useChallengeLink() {
       const encoded = params.get(CHALLENGE_PARAM)
       if (!encoded) return null
 
-      const decoded = import.meta.client
-        ? atob(encoded)
-        : Buffer.from(encoded, 'base64').toString()
+      const decoded = atob(encoded)
 
       const payload = JSON.parse(decoded) as Record<string, string | number>
 

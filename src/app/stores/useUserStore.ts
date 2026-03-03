@@ -42,7 +42,7 @@ export const useUserStore = defineStore('user', () => {
   }
 
   function updateDailyStreak() {
-    const today = new Date().toISOString().split('T')[0]
+    const today = new Date().toISOString().split('T')[0]!
 
     if (!lastPlayedDate.value) {
       // First time playing
@@ -66,7 +66,7 @@ export const useUserStore = defineStore('user', () => {
       }
     }
 
-    lastPlayedDate.value = today
+    lastPlayedDate.value = today ?? null
     return true
   }
 

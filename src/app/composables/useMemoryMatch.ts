@@ -50,7 +50,7 @@ export function useMemoryMatch() {
     // Shuffle
     for (let i = result.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1))
-      ;[result[i], result[j]] = [result[j], result[i]]
+      ;[result[i], result[j]] = [result[j]!, result[i]!]
     }
     return result
   }
@@ -61,7 +61,7 @@ export function useMemoryMatch() {
     // Shuffle and pick N pairs
     for (let i = pool.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1))
-      ;[pool[i], pool[j]] = [pool[j], pool[i]]
+      ;[pool[i], pool[j]] = [pool[j]!, pool[i]!]
     }
     const selected = pool.slice(0, Math.min(pairCount, pool.length))
 

@@ -12,7 +12,7 @@ const STREAK_LABELS = [
 ]
 
 function currentLabel() {
-  return STREAK_LABELS.find(l => streak.value >= l.min) ?? STREAK_LABELS[4]
+  return STREAK_LABELS.find(l => streak.value >= l.min) ?? STREAK_LABELS[4]!
 }
 
 function fire(x: number, y: number) {

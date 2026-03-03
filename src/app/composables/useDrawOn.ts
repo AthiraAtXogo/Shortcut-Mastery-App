@@ -55,7 +55,7 @@ export function useDrawOn() {
   function drawMultiple(
     paths: SVGPathElement[],
     options: DrawOptions & { stagger?: number } = {}
-  ): Promise<void>[] {
+  ): Promise<void[]> {
     const { stagger = 0.1, ...drawOptions } = options
     return Promise.all(
       paths.map((path, i) =>

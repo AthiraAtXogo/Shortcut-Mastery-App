@@ -25,7 +25,7 @@ const normalizedExpected = computed(() => normalizeCombo(expected.value))
 // #region watchers
 watch(lastKeyCombo, (combo) => {
   if (!isCapturing.value || combo.length === 0) return
-  lastResult.value = validate(combo, expected.value, { allowPartial: true })
+  lastResult.value = validate([...combo], expected.value, { allowPartial: true })
 })
 // #endregion
 

@@ -166,9 +166,10 @@ function animateLoop() {
   if (isFading) {
     let allGone = true
     for (let i = segments.length - 1; i >= 0; i--) {
-      segments[i].opacity -= 0.03
-      if (segments[i].opacity <= 0) {
-        disposeSegment(segments[i])
+      const seg = segments[i]!
+      seg.opacity -= 0.03
+      if (seg.opacity <= 0) {
+        disposeSegment(seg)
         segments.splice(i, 1)
       } else {
         allGone = false

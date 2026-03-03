@@ -3,7 +3,7 @@ import * as THREE from 'three'
 export function useThree() {
   // SSR-safe reduced motion check
   const prefersReducedMotion = ref(false)
-  if (process.client) {
+  if (import.meta.client) {
     onMounted(() => {
       const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
       prefersReducedMotion.value = mediaQuery.matches

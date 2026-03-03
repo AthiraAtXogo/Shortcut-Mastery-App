@@ -18,7 +18,7 @@ const props = withDefaults(defineProps<Props>(), {
 // #region composables
 // SSR-safe reduced motion check
 const prefersReducedMotion = ref(false)
-if (process.client) {
+if (import.meta.client) {
   onMounted(() => {
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
     prefersReducedMotion.value = mediaQuery.matches

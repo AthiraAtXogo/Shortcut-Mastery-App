@@ -23,7 +23,7 @@ export function useAudio() {
   /**
    * Preload a sound for later playback
    */
-  function preload(name: string, src: string | string[], options?: Partial<Howl>) {
+  function preload(name: string, src: string | string[], options?: object) {
     if (sounds.has(name)) return sounds.get(name)!
 
     const sound = new Howl({
