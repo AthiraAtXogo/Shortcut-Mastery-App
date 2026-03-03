@@ -1,6 +1,8 @@
 {
-  "buildCommand": "cd src && pnpm install && pnpm build",
-  "installCommand": "cd src && pnpm install",
-  "outputDirectory": "src/.vercel/output",
-  "framework": null
+  "buildCommand": "cd src && npm install -g pnpm && pnpm install && pnpm generate",
+  "outputDirectory": "src/.output/public",
+  "framework": null,
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }

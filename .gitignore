@@ -24,22 +24,14 @@ secrets/
 .DS_Store
 Thumbs.db
 
-# Dependencies (uncomment as needed for your stack)
-# node_modules/
-# vendor/
-# __pycache__/
-# *.pyc
-# .venv/
-# target/
-# bin/
-# obj/
+# Dependencies
+node_modules/
 
-# Build outputs (uncomment as needed)
-# dist/
-# build/
-# out/
-# *.o
-# *.exe
+# E2E test artifacts
+e2e-screenshots/
+key-capture-screenshots/
+portal-screenshots/
+threejs-test-screenshots/
 
 # Logs
 *.log

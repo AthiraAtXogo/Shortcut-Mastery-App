@@ -74,13 +74,7 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
-  routeRules: {
-    '/': { prerender: true }
-  },
-
-  nitro: {
-    preset: process.env.NITRO_PRESET ?? 'node-server'
-  },
+  ssr: false,
 
   compatibilityDate: '2025-01-15',
 
